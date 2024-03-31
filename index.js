@@ -12,10 +12,18 @@ app.use(express.json());
 app.use(cors());
 
 // Database Connection with MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  auth: {
+    user: process.env.MONGO_USER,
+    password: process.env.MONGO_PASSWORD
+  }
 });
+
+// Check for database connection errors
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // API Creation 
 app.get('/', (req, res) => {
@@ -91,6 +99,7 @@ const Users = mongoose.model('Users', {
     default: Date.now,
   }
 });
+
 
 // Add Product Endpoint
 app.post('/addproduct', async (req, res) => {
